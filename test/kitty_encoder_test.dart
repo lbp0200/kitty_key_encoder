@@ -88,4 +88,51 @@ void main() {
       expect(KittyKeyCodes.getKeyCode(LogicalKeyboardKey.keyA), isNull);
     });
   });
+
+  group('KittyEncoderFlags', () {
+    test('default flags are all false', () {
+      const flags = KittyEncoderFlags();
+      expect(flags.reportEvent, isFalse);
+      expect(flags.reportAlternateKeys, isFalse);
+      expect(flags.reportAllKeysAsEscape, isFalse);
+    });
+
+    test('toCSIValue returns 0 for default flags', () {
+      const flags = KittyEncoderFlags();
+      expect(flags.toCSIValue(), equals(0));
+    });
+
+    test('toCSIValue returns 1 for reportEvent', () {
+      const flags = KittyEncoderFlags(reportEvent: true);
+      expect(flags.toCSIValue(), equals(1));
+    });
+
+    test('toCSIValue returns 2 for reportAlternateKeys', () {
+      const flags = KittyEncoderFlags(reportAlternateKeys: true);
+      expect(flags.toCSIValue(), equals(2));
+    });
+
+    test('toCSIValue returns 4 for reportAllKeysAsEscape', () {
+      const flags = KittyEncoderFlags(reportAllKeysAsEscape: true);
+      expect(flags.toCSIValue(), equals(4));
+    });
+
+    test('toCSIValue combines flags correctly', () {
+      const flags = KittyEncoderFlags(
+        reportEvent: true,
+        reportAlternateKeys: true,
+      );
+      expect(flags.toCSIValue(), equals(3)); // 1 + 2
+    });
+
+    test('isExtendedMode returns true when any flag is set', () {
+      const flags = KittyEncoderFlags(reportEvent: true);
+      expect(flags.isExtendedMode, isTrue);
+    });
+
+    test('isExtendedMode returns false for default', () {
+      const flags = KittyEncoderFlags();
+      expect(flags.isExtendedMode, isFalse);
+    });
+  });
 }
