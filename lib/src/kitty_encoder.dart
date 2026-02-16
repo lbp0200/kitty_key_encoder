@@ -3,7 +3,7 @@ import 'kitty_key_codes.dart';
 import 'kitty_modifier_codes.dart';
 import 'kitty_flags.dart';
 
-/// Simple key event class to represent keyboard events
+/// Simple key event class for testing - wraps LogicalKeyboardKey with modifiers
 class SimpleKeyEvent {
   final LogicalKeyboardKey logicalKey;
   final Set<SimpleModifier> modifiers;
@@ -23,6 +23,8 @@ enum SimpleModifier {
 }
 
 /// Kitty Encoder - converts Flutter KeyEvent to Kitty escape sequences
+///
+/// Supports both [KeyEvent] from Flutter and [SimpleKeyEvent] for testing.
 class KittyEncoder {
   final KittyEncoderFlags flags;
 
