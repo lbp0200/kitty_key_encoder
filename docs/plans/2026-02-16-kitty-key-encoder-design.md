@@ -213,4 +213,4 @@ Flag values (bits):
 
 ## References
 
-- [Kitty Keyboard Protocol Specification](https://sw.kde.org/sites/default/files/documents/keyboard-protocol.md)
+- [Kitty Keyboard Protocol Specification](https://sw.kovidgoyal.net/kitty/keyboard-protocol/)

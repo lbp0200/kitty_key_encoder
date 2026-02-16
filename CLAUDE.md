@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`kitty_key_encoder` is a Flutter package that encodes Flutter KeyEvent to [Kitty Keyboard Protocol](https://sw.kde.org/sites/default/files/documents/keyboard-protocol.md) escape sequences. Used for Flutter terminal emulators to send properly formatted key sequences to backend processes.
+`kitty_key_encoder` is a Flutter package that encodes Flutter KeyEvent to [Kitty Keyboard Protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/) escape sequences. Used for Flutter terminal emulators to send properly formatted key sequences to backend processes.
 
 ## Commands
 
