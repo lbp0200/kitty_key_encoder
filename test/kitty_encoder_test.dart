@@ -291,21 +291,38 @@ void main() {
       expect(encoder.isExtendedMode, isFalse);
     });
 
-    // Key Release Tests
-    test('encode key down without reportEvent has no ~ prefix', () {
+    // Key Event Types Tests (Kitty Protocol)
+    test('encode key down in extended mode includes event_type 1', () {
       const encoder = KittyEncoder(
         flags: KittyEncoderFlags(reportEvent: true),
       );
       const event = SimpleKeyEvent(
         logicalKey: LogicalKeyboardKey.enter,
         isKeyUp: false,
+        isKeyRepeat: false,
       );
       final result = encoder.encode(event);
-      expect(result, equals('\x1b[>1;28;1u'));
-      expect(result.startsWith('~'), isFalse);
+      // Format: \x1b[>flags;event_type;key;modifiersu
+      // event_type 1 = keyDown
+      expect(result, equals('\x1b[>1;1;28;1u'));
     });
 
-    test('encode key release with reportEvent adds ~ prefix', () {
+    test('encode key repeat in extended mode includes event_type 2', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(reportEvent: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        isKeyUp: false,
+        isKeyRepeat: true,
+      );
+      final result = encoder.encode(event);
+      // Format: \x1b[>flags;event_type;key;modifiersu
+      // event_type 2 = keyRepeat
+      expect(result, equals('\x1b[>1;2;28;1u'));
+    });
+
+    test('encode key up in extended mode includes event_type 3', () {
       const encoder = KittyEncoder(
         flags: KittyEncoderFlags(reportEvent: true),
       );
@@ -314,10 +331,12 @@ void main() {
         isKeyUp: true,
       );
       final result = encoder.encode(event);
-      expect(result, equals('~\x1b[>1;28;1u'));
+      // Format: \x1b[>flags;event_type;key;modifiersu
+      // event_type 3 = keyUp
+      expect(result, equals('\x1b[>1;3;28;1u'));
     });
 
-    test('encode key release without reportEvent has no ~ prefix', () {
+    test('encode key up in non-extended mode uses ~ prefix', () {
       const encoder = KittyEncoder();
       const event = SimpleKeyEvent(
         logicalKey: LogicalKeyboardKey.enter,
@@ -325,6 +344,35 @@ void main() {
       );
       final result = encoder.encode(event);
       expect(result, equals('\x1b[28;1u'));
+    });
+
+    test('encode key repeat in non-extended mode has no special handling', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        isKeyRepeat: true,
+      );
+      final result = encoder.encode(event);
+      // Key repeat is treated as key down in non-extended mode
+      expect(result, equals('\x1b[28;1u'));
+    });
+
+    // Backspace Tests
+    test('encode Backspace produces correct sequence', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(logicalKey: LogicalKeyboardKey.backspace);
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[27;1u'));
+    });
+
+    test('encode Backspace in extended mode produces correct sequence', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(reportEvent: true),
+      );
+      const event = SimpleKeyEvent(logicalKey: LogicalKeyboardKey.backspace);
+      final result = encoder.encode(event);
+      // Backspace code is 27, event_type 1 = keyDown
+      expect(result, equals('\x1b[>1;1;27;1u'));
     });
 
     // IME/Text Editing Conflict Tests

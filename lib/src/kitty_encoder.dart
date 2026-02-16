@@ -3,17 +3,39 @@ import 'kitty_key_codes.dart';
 import 'kitty_modifier_codes.dart';
 import 'kitty_flags.dart';
 
+/// Event types per Kitty Keyboard Protocol
+enum KittyEventType {
+  /// Key down event (type 1)
+  keyDown(1),
+  /// Key repeat event (type 2)
+  keyRepeat(2),
+  /// Key up event (type 3)
+  keyUp(3);
+
+  final int value;
+  const KittyEventType(this.value);
+}
+
 /// Simple key event class for testing - wraps LogicalKeyboardKey with modifiers
 class SimpleKeyEvent {
   final LogicalKeyboardKey logicalKey;
   final Set<SimpleModifier> modifiers;
   final bool isKeyUp;
+  final bool isKeyRepeat;
 
   const SimpleKeyEvent({
     required this.logicalKey,
     this.modifiers = const {},
     this.isKeyUp = false,
+    this.isKeyRepeat = false,
   });
+
+  /// Get the event type for Kitty protocol
+  KittyEventType get eventType {
+    if (isKeyUp) return KittyEventType.keyUp;
+    if (isKeyRepeat) return KittyEventType.keyRepeat;
+    return KittyEventType.keyDown;
+  }
 }
 
 /// Simple modifier enum for key events
@@ -67,13 +89,21 @@ class KittyEncoder {
     String sequence;
     if (flags.isExtendedMode) {
       final csiValue = flags.toCSIValue();
-      sequence = '\x1b[>$csiValue;$effectiveKeyCode;${modifiers}u';
+
+      // When reportEventTypes is enabled, include event_type in the sequence
+      if (flags.reportEvent) {
+        // Format: \x1b[>flags;event_type;key;modifiersu
+        sequence = '\x1b[>$csiValue;${event.eventType.value};$effectiveKeyCode;${modifiers}u';
+      } else {
+        sequence = '\x1b[>$csiValue;$effectiveKeyCode;${modifiers}u';
+      }
     } else {
       sequence = '\x1b[$effectiveKeyCode;${modifiers}u';
     }
 
-    // Handle key release events when reportEvent is enabled
-    if (flags.reportEvent && event.isKeyUp) {
+    // Handle key release events in non-extended mode (using ~ prefix)
+    // Note: In extended mode with reportEvent, we use event_type instead
+    if (!flags.isExtendedMode && flags.reportEvent && event.isKeyUp) {
       sequence = '~$sequence';
     }
 
