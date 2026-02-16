@@ -1,0 +1,27 @@
+# Dart
+.dart_tool/
+.packages
+.pub/
+build/
+pubspec.lock
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+
+# Misc
+*.log
