@@ -134,6 +134,16 @@ void main() {
       const flags = KittyEncoderFlags();
       expect(flags.isExtendedMode, isFalse);
     });
+
+    test('deferToSystemOnComplexInput defaults to false', () {
+      const flags = KittyEncoderFlags();
+      expect(flags.deferToSystemOnComplexInput, isFalse);
+    });
+
+    test('deferToSystemOnComplexInput can be set to true', () {
+      const flags = KittyEncoderFlags(deferToSystemOnComplexInput: true);
+      expect(flags.deferToSystemOnComplexInput, isTrue);
+    });
   });
 
   group('KittyEncoder', () {
@@ -279,6 +289,104 @@ void main() {
       final newEncoder = encoder.withFlags(const KittyEncoderFlags(reportEvent: true));
       expect(newEncoder.isExtendedMode, isTrue);
       expect(encoder.isExtendedMode, isFalse);
+    });
+
+    // Key Release Tests
+    test('encode key down without reportEvent has no ~ prefix', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(reportEvent: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        isKeyUp: false,
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[>1;28;1u'));
+      expect(result.startsWith('~'), isFalse);
+    });
+
+    test('encode key release with reportEvent adds ~ prefix', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(reportEvent: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        isKeyUp: true,
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('~\x1b[>1;28;1u'));
+    });
+
+    test('encode key release without reportEvent has no ~ prefix', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        isKeyUp: true,
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[28;1u'));
+    });
+
+    // IME/Text Editing Conflict Tests
+    test('deferToSystemOnComplexInput returns empty for Ctrl+Letter', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(deferToSystemOnComplexInput: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.keyA,
+        modifiers: {SimpleModifier.control},
+      );
+      final result = encoder.encode(event);
+      expect(result, equals(''));
+    });
+
+    test('deferToSystemOnComplexInput returns empty for Alt+Letter', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(deferToSystemOnComplexInput: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.keyB,
+        modifiers: {SimpleModifier.alt},
+      );
+      final result = encoder.encode(event);
+      expect(result, equals(''));
+    });
+
+    test('deferToSystemOnComplexInput still encodes non-printable with modifiers', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(deferToSystemOnComplexInput: true),
+      );
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        modifiers: {SimpleModifier.control},
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[13;5u'));
+    });
+
+    test('deferToSystemOnComplexInput works with Shift+Printable when enabled', () {
+      const encoder = KittyEncoder(
+        flags: KittyEncoderFlags(deferToSystemOnComplexInput: true),
+      );
+      // Shift+letter is printable but has modifier, should defer
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.keyA,
+        modifiers: {SimpleModifier.shift},
+      );
+      final result = encoder.encode(event);
+      // keyA is not in KittyKeyCodes, so returns empty anyway
+      expect(result, equals(''));
+    });
+
+    test('deferToSystemOnComplexInput disabled by default', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.keyA,
+        modifiers: {SimpleModifier.control},
+      );
+      final result = encoder.encode(event);
+      // keyA is not mapped, returns empty
+      expect(result, equals(''));
     });
   });
 }

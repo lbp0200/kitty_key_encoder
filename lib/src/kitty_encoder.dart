@@ -7,10 +7,12 @@ import 'kitty_flags.dart';
 class SimpleKeyEvent {
   final LogicalKeyboardKey logicalKey;
   final Set<SimpleModifier> modifiers;
+  final bool isKeyUp;
 
   const SimpleKeyEvent({
     required this.logicalKey,
     this.modifiers = const {},
+    this.isKeyUp = false,
   });
 }
 
@@ -41,6 +43,16 @@ class KittyEncoder {
     final modifierFlags = _extractModifiers(event);
     final modifiers = KittyModifierCodes.calculateModifiers(modifierFlags);
 
+    // Handle IME/text editing conflict
+    // When deferToSystemOnComplexInput is enabled and we have printable
+    // characters with modifiers (like Ctrl+Letter), return empty to let
+    // system handle it
+    if (flags.deferToSystemOnComplexInput && modifierFlags != 0) {
+      if (_isPrintableKey(event.logicalKey)) {
+        return '';
+      }
+    }
+
     // Apply modifier-specific key code offset per Kitty protocol
     int effectiveKeyCode = keyCode;
     if (modifierFlags & KittyModifierCodes.ctrl != 0) {
@@ -51,12 +63,32 @@ class KittyEncoder {
       effectiveKeyCode -= 10; // Alt offsets key code by -10
     }
 
+    // Build the escape sequence
+    String sequence;
     if (flags.isExtendedMode) {
       final csiValue = flags.toCSIValue();
-      return '\x1b[>$csiValue;$effectiveKeyCode;${modifiers}u';
+      sequence = '\x1b[>$csiValue;$effectiveKeyCode;${modifiers}u';
+    } else {
+      sequence = '\x1b[$effectiveKeyCode;${modifiers}u';
     }
 
-    return '\x1b[$effectiveKeyCode;${modifiers}u';
+    // Handle key release events when reportEvent is enabled
+    if (flags.reportEvent && event.isKeyUp) {
+      sequence = '~$sequence';
+    }
+
+    return sequence;
+  }
+
+  bool _isPrintableKey(LogicalKeyboardKey key) {
+    // Check if key is a printable character (A-Z, a-z, 0-9, symbols)
+    final keyLabel = key.keyLabel;
+    if (keyLabel.isEmpty) return false;
+
+    // Check for alphanumeric and common printable characters
+    final code = key.keyId;
+    // Printable ASCII range: 0x1D (29) to 0x7E (126)
+    return (code >= 0x1D && code <= 0x7E);
   }
 
   int _extractModifiers(SimpleKeyEvent event) {
