@@ -185,5 +185,100 @@ void main() {
       final result = encoder.encode(event);
       expect(result, startsWith('\x1b[>'));
     });
+
+    test('encode F2-F12 produce correct sequences', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f2)), equals('\x1b[12;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f3)), equals('\x1b[13;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f4)), equals('\x1b[14;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f5)), equals('\x1b[15;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f6)), equals('\x1b[17;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f7)), equals('\x1b[18;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f8)), equals('\x1b[19;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f9)), equals('\x1b[20;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f10)), equals('\x1b[21;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f11)), equals('\x1b[23;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.f12)), equals('\x1b[24;1u'));
+    });
+
+    test('encode arrow keys produce correct sequences', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.arrowUp)), equals('\x1b[30;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.arrowDown)), equals('\x1b[31;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.arrowRight)), equals('\x1b[32;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.arrowLeft)), equals('\x1b[33;1u'));
+    });
+
+    test('encode Ctrl+Shift+Enter produces correct sequence', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.enter,
+        modifiers: {SimpleModifier.control, SimpleModifier.shift},
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[13;6u'));
+    });
+
+    test('encode Alt+F4 produces correct sequence', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.f4,
+        modifiers: {SimpleModifier.alt},
+      );
+      final result = encoder.encode(event);
+      expect(result, equals('\x1b[14;3u'));
+    });
+
+    test('encode navigation keys produce correct sequences', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.pageUp)), equals('\x1b[35;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.pageDown)), equals('\x1b[34;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.home)), equals('\x1b[36;1u'));
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.end)), equals('\x1b[37;1u'));
+    });
+
+    test('encode Escape produces correct sequence', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.escape)), equals('\x1b[53;1u'));
+    });
+
+    test('encode Backspace produces correct sequence', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.backspace)), equals('\x1b[27;1u'));
+    });
+
+    test('encode Space produces correct sequence', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.space)), equals('\x1b[44;1u'));
+    });
+
+    test('encode Delete produces correct sequence', () {
+      const encoder = KittyEncoder();
+      expect(encoder.encode(const SimpleKeyEvent(logicalKey: LogicalKeyboardKey.delete)), equals('\x1b[127;1u'));
+    });
+
+    test('encode Meta key produces correct sequence', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(
+        logicalKey: LogicalKeyboardKey.keyA,
+        modifiers: {SimpleModifier.meta},
+      );
+      final result = encoder.encode(event);
+      // keyA is not mapped, should return empty
+      expect(result, equals(''));
+    });
+
+    test('encode unknown key returns empty string', () {
+      const encoder = KittyEncoder();
+      const event = SimpleKeyEvent(logicalKey: LogicalKeyboardKey.keyA);
+      expect(encoder.encode(event), equals(''));
+    });
+
+    test('withFlags creates new encoder with different flags', () {
+      const encoder = KittyEncoder();
+      final newEncoder = encoder.withFlags(const KittyEncoderFlags(reportEvent: true));
+      expect(newEncoder.isExtendedMode, isTrue);
+      expect(encoder.isExtendedMode, isFalse);
+    });
   });
 }
