@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kitty_key_encoder/kitty_key_encoder.dart';
 
@@ -45,6 +46,46 @@ void main() {
         ),
         equals(8),
       );
+    });
+  });
+
+  group('KittyKeyCodes', () {
+    test('F1 has correct code', () {
+      expect(KittyKeyCodes.f1, equals(11));
+    });
+
+    test('F12 has correct code', () {
+      expect(KittyKeyCodes.f12, equals(24));
+    });
+
+    test('ArrowUp has correct code', () {
+      expect(KittyKeyCodes.arrowUp, equals(30));
+    });
+
+    test('ArrowLeft has correct code', () {
+      expect(KittyKeyCodes.arrowLeft, equals(33));
+    });
+
+    test('Enter has correct code', () {
+      expect(KittyKeyCodes.enter, equals(28));
+    });
+
+    test('Tab has correct code', () {
+      expect(KittyKeyCodes.tab, equals(29));
+    });
+
+    test('Escape has correct code', () {
+      expect(KittyKeyCodes.escape, equals(53));
+    });
+
+    test('getKeyCode returns correct code for LogicalKeyboardKey', () {
+      expect(KittyKeyCodes.getKeyCode(LogicalKeyboardKey.f1), equals(11));
+      expect(KittyKeyCodes.getKeyCode(LogicalKeyboardKey.enter), equals(28));
+      expect(KittyKeyCodes.getKeyCode(LogicalKeyboardKey.tab), equals(29));
+    });
+
+    test('getKeyCode returns null for unmapped keys', () {
+      expect(KittyKeyCodes.getKeyCode(LogicalKeyboardKey.keyA), isNull);
     });
   });
 }
