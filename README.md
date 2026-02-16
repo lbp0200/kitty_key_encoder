@@ -13,6 +13,7 @@ This package is designed for Flutter terminal emulators. It converts Flutter key
 - **Progressive enhancement**: Support for Kitty protocol's extended modes
 - **IME handling**: Optional deferral for complex input scenarios
 - **Key release events**: Optional reporting of key release events
+- **Key repeat support**: Full event type reporting (keyDown, keyRepeat, keyUp)
 
 ## Installation
 
@@ -40,11 +41,18 @@ void main() {
   );
   print(encoder.encode(event2)); // \x1b[13;5u
 
-  // Extended mode
+  // Extended mode with event types
   const encoder2 = KittyEncoder(
     flags: KittyEncoderFlags(reportEvent: true),
   );
-  print(encoder2.encode(event1)); // \x1b[>1;28;1u
+  print(encoder2.encode(event1)); // \x1b[>1;1;28;1u
+
+  // Key repeat
+  const event3 = SimpleKeyEvent(
+    logicalKey: LogicalKeyboardKey.arrowUp,
+    isKeyRepeat: true,
+  );
+  print(encoder2.encode(event3)); // \x1b[>1;2;30;1u
 }
 ```
 
@@ -89,6 +97,17 @@ Key event class with:
 - `logicalKey`: The keyboard key
 - `modifiers`: Set of modifiers (shift, control, alt, meta)
 - `isKeyUp`: Whether this is a key release event
+- `isKeyRepeat`: Whether this is a key repeat event
+
+### KittyEventType
+
+Event types per Kitty protocol:
+- `keyDown`: Event type 1
+- `keyRepeat`: Event type 2
+- `keyUp`: Event type 3
+
+In extended mode with `reportEvent`, the escape sequence format is:
+`\x1b[>flags;event_type;key;modifiersu`
 
 ## References
 
