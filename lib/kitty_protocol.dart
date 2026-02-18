@@ -11,6 +11,12 @@
 /// - **Text Sizing Protocol**: Variable-size text rendering
 ///   Reference: doc/kitty/docs/text-sizing-protocol.rst
 ///
+/// - **File Transfer Protocol**: File transfer over TTY
+///   Reference: doc/kitty/docs/file-transfer-protocol.rst
+///
+/// - **Notifications Protocol**: Desktop notifications via OSC 99
+///   Reference: doc/kitty/docs/desktop-notifications.rst
+///
 /// Reference: doc/kitty/docs/
 library kitty_protocol;
 
@@ -26,5 +32,16 @@ export 'src/graphics/kitty_graphics_encoder.dart';
 // Text sizing protocol exports
 export 'src/text_sizing/kitty_text_sizing_encoder.dart';
 
+// File transfer protocol exports
+export 'src/file_transfer/kitty_file_transfer_encoder.dart';
+
+// Clipboard protocol exports
+export 'src/clipboard/kitty_clipboard_encoder.dart';
+
+// Notifications protocol exports
+export 'src/notifications/kitty_notification_encoder.dart';
+
 // Common exports
 export 'src/common/kitty_common.dart';
+export 'src/common/kitty_underline.dart';
+export 'src/common/kitty_pointer_shapes.dart';
