@@ -17,6 +17,9 @@
 /// - **Notifications Protocol**: Desktop notifications via OSC 99
 ///   Reference: doc/kitty/docs/desktop-notifications.rst
 ///
+/// - **Remote Control Protocol**: Terminal control via DCS/JSON
+///   Reference: doc/kitty/docs/rc_protocol.rst
+///
 /// Reference: doc/kitty/docs/
 library kitty_protocol;
 
@@ -45,3 +48,7 @@ export 'src/notifications/kitty_notification_encoder.dart';
 export 'src/common/kitty_common.dart';
 export 'src/common/kitty_underline.dart';
 export 'src/common/kitty_pointer_shapes.dart';
+export 'src/common/kitty_color_stack.dart';
+
+// Remote control exports
+export 'src/remote_control/kitty_remote_control_encoder.dart';
