@@ -1,3 +1,14 @@
+## 1.1.0
+
+- Fix: Use Unicode codepoints per Kitty Keyboard Protocol spec
+  - Enter=13 (was 28), Tab=9 (was 29), Escape=27 (was 53), Backspace=127 (was 27), Space=32 (was 44)
+- Fix: Remove incorrect offset subtraction logic that produced negative numbers
+- Fix: Add C0 control code mapping for Ctrl+letter combinations (Ctrl+a->1, Ctrl+b->2, etc.)
+- Fix: Proper modifier encoding: 1 + bit_flags (Shift=1, Alt=2, Ctrl=4)
+- Fix: When Shift is pressed with Ctrl, don't apply C0 mapping (use base codepoint)
+- Docs: Add protocol documentation comments referencing official spec
+- Test: Add comprehensive protocol compliance test suite
+
 ## 1.0.0
 
 - Initial release
