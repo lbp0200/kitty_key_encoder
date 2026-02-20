@@ -30,7 +30,6 @@ coverage/
 # --- 5. 本地开发与敏感信息 ---
 *.local
 .env*
-# pubspec.lock (库项目通常不强制提交)
-pubspec.lock
+# pubspec.lock - 现在需要提交以确保依赖一致性
 .claude
 .worktrees/

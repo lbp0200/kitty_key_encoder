@@ -1,3 +1,13 @@
+## 1.2.2
+
+- Fix: Use `flutter pub publish` instead of `flutter publish` in CI/CD
+- Fix: Add OIDC permissions for secure publishing to pub.dev
+- Fix: Use sed instead of cut for version extraction robustness
+- Feat: Add test coverage reporting in CI (`--coverage`)
+- Feat: Add publish dry-run check before publishing
+- Feat: Add TDD requirements and verification checklist to CLAUDE.md
+- Chore: Use built-in cache instead of manual actions/cache
+
 ## 1.1.0
 
 - Fix: Use Unicode codepoints per Kitty Keyboard Protocol spec
