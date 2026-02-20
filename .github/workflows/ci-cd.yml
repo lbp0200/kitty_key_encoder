@@ -67,7 +67,7 @@ jobs:
           fi
 
       - name: Publish Dry Run
-        run: flutter publish --dry-run
+        run: flutter pub publish --dry-run
 
       - name: Publish to pub.dev
-        run: flutter publish -f
+        run: flutter pub publish -f
