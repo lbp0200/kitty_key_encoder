@@ -1,5 +1,6 @@
 # --- 1. 协议源文档与 AI 配置文件 ---
 doc/
+docs/
 *.rst
 CLAUDE.md
 .cursorrules
